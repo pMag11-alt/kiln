@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    name: Ubuntu, ${{ matrix.cpus }} hart(s)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cpus: [1, 4]
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install clang, lld, QEMU and e2fsprogs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            clang lld llvm qemu-system-misc opensbi e2fsprogs
+      - name: Build kernel, user space and the ext2 image
+        run: make -j"$(nproc)"
+      - name: Boot and test (usertests, shell, e2fsck, debugfs interop)
+        run: make test CPUS=${{ matrix.cpus }}
+
+  macos:
+    name: macOS, 4 harts
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install toolchain
+        run: brew install llvm lld qemu e2fsprogs
+      - run: make -j"$(sysctl -n hw.ncpu)"
+      - run: make test CPUS=4

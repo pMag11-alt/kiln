@@ -1,0 +1,2 @@
+Hello from an ext2 file system, written by mke2fs on the host
+and read by the kiln kernel.

@@ -1,0 +1,7 @@
+
+  _    _ _
+ | | _(_) |_ __     a small Unix-like kernel for RISC-V
+ | |/ / | | '_ \    Sv39 · SMP · copy-on-write fork · ext2
+ |   <| | | | | |
+ |_|\_\_|_|_| |_|   try: ls /bin, help, ps, free, primes 50
+
